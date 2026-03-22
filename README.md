@@ -95,7 +95,7 @@ This isn't just another ESP32-CAM tutorial project. Here's what makes it differe
 |-----------|--------------|---------|-------|
 | **ESP32-CAM** | AI Thinker module with OV2640 | Main controller + camera | Must have PSRAM |
 | **Power Supply** | 5V/2A regulated | System power | **Critical**: 1A minimum, 2A recommended |
-| **Relay Module** | 5V SRD-05VDC-SL-C | Door strike control | Active-LOW trigger |
+| ** Module** | 5V SRD-05VDC-SL-C | Door strike control | Active-LOW trigger |
 | **OLED Display** | 128x64 I2C (SSD1306/SH1107) | Status display | Connected to GPIO 13/14 |
 | **Push Button** | Normally open momentary | Manual scan trigger | INPUT_PULLUP mode |
 | **Buzzer** | Passive buzzer | Audio alerts | PWM-driven via LEDC |
@@ -105,11 +105,12 @@ This isn't just another ESP32-CAM tutorial project. Here's what makes it differe
 
 ```cpp
 // Hardware Pins
-#define RELAY_PIN   4   // Door lock relay control
+#define RELAY_PIN   2   // Door lock relay control
 #define BUTTON_PIN  15  // Physical doorbell button
-#define BUZZER_PIN  2   // Alert buzzer (LEDC channel 8)
+#define BUZZER_PIN  12   // Alert buzzer (LEDC channel 8)
 #define I2C_SDA     13  // OLED display data
 #define I2C_SCL     14  // OLED display clock
+#define FLASH_LED_PIN 4 // On board led (LEDC channel 7)
 ```
 
 ### Wiring Diagram
@@ -118,9 +119,9 @@ This isn't just another ESP32-CAM tutorial project. Here's what makes it differe
 ESP32-CAM Module
 ├─ 5V     → Power supply +5V (2A recommended)
 ├─ GND    → Common ground + capacitor negative
-├─ GPIO 4 → Relay IN (door lock control)
+├─ GPIO 2 → Relay IN (door lock control)
 ├─ GPIO 15→ Button (other side to GND)
-├─ GPIO 2 → Buzzer + (buzzer - to GND)
+├─ GPIO 12 → Buzzer + (buzzer - to GND)
 ├─ GPIO 13→ OLED SDA
 └─ GPIO 14→ OLED SCL
 
