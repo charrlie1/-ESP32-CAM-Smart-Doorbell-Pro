@@ -768,7 +768,7 @@ void loop() {
       matchFace = false;
       tone(BUZZER_PIN, 2000, 50);
       lastButtonPress = millis();
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate — don't wait; AI scan blocks the loop for hundreds of ms
     }
   }
 
@@ -788,9 +788,8 @@ void loop() {
         // enrollment completely finished !
         Serial.println("Face Enrollment Completed via Telegram !");
         currentState = STANDBY;
-        displayNeedsUpdate = true;
+        updateDisplay(); // immediate — notifyAllAdmins blocks
         tone(BUZZER_PIN, 1000, 200); delay(200); tone(BUZZER_PIN, 1500, 300);
-
         notifyAllAdmins("✅ Face Enrollment Successful! New Face ID saved.", false);
         break;    
       }
@@ -806,9 +805,12 @@ void loop() {
         Serial.printf("Face Matched! ID: %d. Unlocking...\n", face_id);
         currentState = UNLOCKED;
         unlockStartTime = millis();
-        digitalWrite(RELAY_PIN, LOW); // (Note to change to LOW later if you use the NPN transistor not gate)
+        digitalWrite(RELAY_PIN, LOW);
+        faceAnimFrame   = 0;
+        faceAnimPlaying = true;
+        updateDisplay(); // immediate — notifyAllAdmins + sendTelegramStatusPin block for seconds
+
         tone(BUZZER_PIN, 1500, 100);
-        displayNeedsUpdate = true;
 
         struct tm timeinfo;
         if (getLocalTime(&timeinfo)) {
@@ -819,9 +821,6 @@ void loop() {
         lastUnlockedBy = "Face ID " + String(face_id); 
         notifyAllAdmins("🏠 Door unlocked by Face Recognition at " + lastEntryTime, false);
         sendTelegramStatusPin(lastUnlockedBy, lastEntryTime);
-        // Trigger one-shot face→tick animation before WELCOME screen
-        faceAnimFrame   = 0;
-        faceAnimPlaying = true;
       } 
       
       
@@ -833,13 +832,13 @@ void loop() {
         intruderCount++;
         prefs.putInt("intruders", intruderCount);
         tone(BUZZER_PIN, 500, 1000);
-        displayNeedsUpdate = true;
+        updateDisplay(); // immediate — photo upload loop blocks for several seconds
 
         String keyboardJson = "[[{\"text\":\"✅ Unlock\",\"callback_data\":\"unlock\"},{\"text\":\"❌ Dismiss\",\"callback_data\":\"dismiss\"}],[{\"text\":\"📷 View Photo\",\"callback_data\":\"photo\"},{\"text\":\"🚨 Sound Alarm\",\"callback_data\":\"alarm\"}]]";
         String intruderCaption = "🚨 [INTRUDER ALERT] 🚨\n\nUnknown person at door!\n\nSelect Action:";
         
         for (int i = 0; i < NUM_USERS; i++) {
-          if (authorizedUsers[i].accessLevel == 0) { // 0 = Admin
+          if (authorizedUsers[i].accessLevel == 0) {
             sendPhotoWithKeyboard(intruderCaption, authorizedUsers[i].chat_id, keyboardJson);
           }
         }
@@ -1451,7 +1450,7 @@ void handleCallbackQuery(int numNewMessages) {
       unlockStartTime = millis();
       digitalWrite(RELAY_PIN, LOW);
       lastUnlockedBy = userName;
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate — blocking HTTP calls follow
 
       struct tm timeinfo;
       if (getLocalTime(&timeinfo)) {
@@ -1494,7 +1493,7 @@ void handleCallbackQuery(int numNewMessages) {
       }
       currentState = SIREN;
       sirenState = false;
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate
       bot->answerCallbackQuery(query_id, "🚨 Alarm activated");
       
       // 👇 FIX
@@ -1507,7 +1506,7 @@ void handleCallbackQuery(int numNewMessages) {
     else if (callback_data == "stop_alarm") {
       currentState = STANDBY;
       ledcWriteTone(8, 0);
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate
       bot->answerCallbackQuery(query_id, "✅ Alarm stopped");
       
       
@@ -1648,7 +1647,7 @@ void handleNewMessages(int numNewMessages) {
       unlockStartTime = millis();
       digitalWrite(RELAY_PIN, LOW);
       lastUnlockedBy = userName;
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate — sendMainMenu + sendTelegramStatusPin block
 
       struct tm timeinfo;
       if (getLocalTime(&timeinfo)) {
@@ -1694,12 +1693,11 @@ void handleNewMessages(int numNewMessages) {
 	      bot -> sendMessage(chat_id, "⛔ Admins only","");
 	      continue;
 	    }
-      trigger_enrollment(); // Tells the AI the next faces it sees should be saved!
-      currentState = SCANNING; // Force the doorbell into scanning mode
-      scanStartTime = millis(); // Reset the timer
-
+      trigger_enrollment();
+      currentState = SCANNING;
+      scanStartTime = millis();
       ledcWrite(7, 200);
-      
+      updateDisplay(); // immediate — sendMessage blocks
       bot->sendMessage(chat_id, "📸 Enrollment Mode active \n1 Look directly at the camera for 20 seconds \n2 you will hear the beep as it captures each angle", "");
     }
 
@@ -1738,7 +1736,7 @@ void handleNewMessages(int numNewMessages) {
       }
       currentState = SIREN;
       sirenState = false;
-      displayNeedsUpdate = true;
+      updateDisplay(); // immediate
       sendSirenControl(chat_id, "🚨 ALARM ON");
     }
 
