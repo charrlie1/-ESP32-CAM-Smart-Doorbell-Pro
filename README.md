@@ -7,7 +7,7 @@
 
 An enterprise-grade, IoT-enabled smart doorbell system built on the ESP32-CAM platform. This project transcends standard tutorials by implementing **production-ready security** with SHA-256 hashed credentials, persistent NVS storage, Over-The-Air (OTA) firmware updates, and a fully-featured Telegram Bot interface for remote access control.
 
-![Product Concept](docs/images/Design Concept 3.png)
+![Product Concept](docs/images/Design Concept3.png)
 *Professional smart doorbell system - Modern security meets IoT innovation*
 
 ---
