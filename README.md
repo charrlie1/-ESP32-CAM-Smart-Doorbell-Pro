@@ -347,7 +347,7 @@ During development, adding SHA-256 hashing, OTA updates, and Telegram integratio
 
 ```cpp
 // In initCamera() function:
-config.xclk_freq_hz = 10000000;  // CRITICAL: Lowered from 20MHz to 10MHz
+config.xclk_freq_hz = 10000000; 
 ```
 
 **Additional Stability Measures**:
@@ -594,12 +594,12 @@ WiFi.begin(ssid, password, wifiCache.channel, wifiCache.bssid, true);
 
 ### Telegram Bot Interface
 
-![Bot Interface](docs/images/telegram-interface.jpg)
+![Bot Interface](docs/Screenshot_20260322-042014.png)
 *Inline keyboards, intruder alerts, and admin controls*
 
 ### Web Interface (Optional)
 
-![Web Streaming](docs/images/web-interface.jpg)
+![Web Streaming](docs/sampling.png)
 *Live camera stream accessible at http://[ESP32-IP]:81*
 
 ---
@@ -641,8 +641,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 *Electrical/Electronic Engineering Student | IoT Enthusiast | Embedded Systems Developer*
 
 - GitHub: [@charrlie1](https://github.com/charrlie1)
-- LinkedIn: [Toluwanimi Charles](https://linkedin.com/in/toluwanimi-charles)
-- Email: [your-email@example.com](mailto:your-email@example.com)
+- LinkedIn: [Toluwanimi Charles](https://www.linkedin.com/in/charles-abodunrin-1003262a5/)
+- Email: [charlesabodunrin@gmail.com](mailto:charlesabodunrin@gmail.com)
 
 ---
 
